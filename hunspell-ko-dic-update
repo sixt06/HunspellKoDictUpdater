@@ -1,0 +1,62 @@
+#!/usr/bin/perl
+
+use strict;
+use LWP::Simple;
+use File::Copy;
+
+my $workdir="$ENV{HOME}/Library/Application\ Support/hunspell-ko-dic";
+my $workdir2="$ENV{HOME}/Library/Application\\ Support/hunspell-ko-dic";
+
+# check workdir
+if (! -e $workdir) {
+    mkdir($workdir);
+}
+
+# check project page
+my $data = get('http://code.google.com/p/spellcheck-ko/');
+unless (length($data)) {
+    print "Connection Error\n";
+    exit;
+}
+
+my $dic_filename;
+foreach (split(/\n/, $data)) {
+    chomp;
+    if (/(ko-aff-dic-\d+.\d+.\d+.zip)/) {
+	$dic_filename=$1;
+	last;
+    }
+}
+
+unless ($dic_filename) {
+    print "HTML Parsing Error\n";
+    exit;
+}
+
+print "PROGRESS:30\n";
+
+# download the lastest file
+my $url="http://spellcheck-ko.googlecode.com/files/$dic_filename";
+if (! -e "$workdir/$dic_filename") {
+    print "deleting old files ...\n";
+    print "PROGRESS:60\n";
+    unlink(<$workdir/*.zip>);
+    print "Downloading $dic_filename ...\n";
+    getstore($url, "$workdir/$dic_filename");
+    print "PROGRESS:90\n";
+    print "Updating dictionary files ...\n";
+    exec "unzip -j -o $workdir2/$dic_filename */ko.dic */ko.aff -d $ENV{HOME}/Library/Spelling";
+    print "PROGRESS:100\n";
+} else {
+    if ( ! -e "$ENV{HOME}/Library/Spelling/ko.dic") {
+	print "restoring dictionary files ...\n";
+	exec "unzip -j -o $workdir2/$dic_filename */ko.dic */ko.aff -d $ENV{HOME}/Library/Spelling";
+	print "PROGRESS:100\n";
+    } else {
+	print "Dictionary files are updated.\n";
+	print "PROGRESS:100\n";
+	sleep 3;
+	exit;
+    }
+}
+	
