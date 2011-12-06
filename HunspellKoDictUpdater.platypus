@@ -52,7 +52,7 @@
 	<key>Role</key>
 	<string>Viewer</string>
 	<key>ScriptPath</key>
-	<string>/Users/sixt06/Developer/hunspell-updater/hunspell-ko-dic-update</string>
+	<string>/Users/sixt06/Developer/github/HunspellKoDictUpdater/hunspell-ko-dic-update</string>
 	<key>Secure</key>
 	<false/>
 	<key>ShowInDock</key>
